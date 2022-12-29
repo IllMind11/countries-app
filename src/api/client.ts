@@ -28,7 +28,7 @@ async function getCountryDetails(name: string) {
 
 async function getCountryByCode(code: string) {
   try {
-    const url = `https://restcountries.com/v3.1/alpha/${code}`;
+    const url = `https://restcountries.com/v3.1/alpha?codes=${code}`;
 
     const promise = await fetch(url);
     const data = await promise.json();
@@ -39,4 +39,4 @@ async function getCountryByCode(code: string) {
   }
 }
 
-export { getAllCountries, getCountryDetails };
+export { getAllCountries, getCountryDetails, getCountryByCode };

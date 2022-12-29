@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { HiArrowNarrowLeft } from "react-icons/hi";
 
-import { getCountryDetails } from "../api/client";
+import { getCountryDetails, getCountryByCode } from "../api/client";
 import LoadingIndicator from "../components/LoadingIndicator";
 import { countryDetailsTypes } from "../types/index";
 
@@ -11,17 +11,36 @@ function CountryPage() {
   const navigate = useNavigate();
 
   const [country, setCountry] = useState<countryDetailsTypes>();
+  const [borders, setBorders] = useState<countryDetailsTypes[]>();
+
+  // console.log(borders)
 
   useEffect(() => {
-    getDetails();
-  }, []);
+    getCountry();
+  }, [name]);
 
-  async function getDetails() {
-    if (name !== undefined) {
-      const data = await getCountryDetails(name);
+  useEffect(() => {
+    getBorders();
+  }, [country]);
 
-      setCountry(data[0]);
+  async function getCountry() {
+    if (name === undefined) return;
+
+    const countryDetails = await getCountryDetails(name);
+    setCountry(countryDetails[0]);
+  }
+
+  async function getBorders() {
+    if (country && Object.hasOwn(country, "borders")) {
+      const countryCodes = country?.borders.join(",");
+      const borders = await getCountryByCode(countryCodes);
+      setBorders(borders);
     }
+  }
+
+  function handleClick(name: string) {
+    setCountry(undefined);
+    navigate(`/country/${name}`);
   }
 
   if (!country) return <LoadingIndicator />;
@@ -108,13 +127,14 @@ function CountryPage() {
 
           <div className="w-full mt-8 flex gap-2 items-center flex-wrap">
             <p className="font-semibold text-lg">Border Countries: </p>
-            {country.borders ? (
-              country.borders.map((border, i) => (
+            {borders ? (
+              borders.map((border, i) => (
                 <span
+                  onClick={() => handleClick(border.name.common)}
                   key={i}
-                  className="mx-1 px-2 py-1 bg-white rounded shadow dark:bg-gray-700"
+                  className="mx-1 px-2 py-1 bg-white rounded shadow cursor-pointer dark:bg-gray-700"
                 >
-                  {border}
+                  {border.name.common}
                 </span>
               ))
             ) : (

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { getAllCountries } from "../api/client";
 import Form from "../components/Form";
 import Card from "../components/Card";
 import { countriesDataTypes } from "../types/index";
@@ -9,24 +8,13 @@ import LoadingIndicator from "../components/LoadingIndicator";
 
 type PropTypes = {
   countries: countriesDataTypes[];
-  setCountries: React.Dispatch<React.SetStateAction<countriesDataTypes[]>>;
 };
 
-function HomePage({ countries, setCountries }: PropTypes) {
+function HomePage({ countries }: PropTypes) {
   const [filteredCountries, setFilteredCountries] =
     useState<countriesDataTypes[]>(countries);
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    fetchCountries();
-  }, []);
-
-  async function fetchCountries() {
-    const data = await getAllCountries();
-    setCountries(data);
-    setFilteredCountries(data);
-  }
 
   function handleSearch(search: string, region: string) {
     let data = [...countries];
